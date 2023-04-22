@@ -1,0 +1,24 @@
+<RCC>
+    <qresource prefix="/">
+        <file>img/case.png</file>
+        <file>img/char.png</file>
+        <file>img/class.png</file>
+        <file>img/default.png</file>
+        <file>img/do.png</file>
+        <file>img/double.png</file>
+        <file>img/else.png</file>
+        <file>img/enum.png</file>
+        <file>img/float.png</file>
+        <file>img/for.png</file>
+        <file>img/if.png</file>
+        <file>img/int.png</file>
+        <file>img/long.png</file>
+        <file>img/private.png</file>
+        <file>img/protected.png</file>
+        <file>img/public.png</file>
+        <file>img/struct.png</file>
+        <file>img/switch.png</file>
+        <file>img/union.png</file>
+        <file>img/while.png</file>
+    </qresource>
+</RCC>

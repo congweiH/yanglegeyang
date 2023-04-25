@@ -67,13 +67,13 @@
       </property>
      </widget>
     </widget>
-    <widget class="QWidget" name="page_4"/>
-    <widget class="QWidget" name="page_2">
+    <widget class="QWidget" name="page_2"/>
+    <widget class="QWidget" name="page_3">
      <widget class="QLabel" name="label_2">
       <property name="geometry">
        <rect>
-        <x>290</x>
-        <y>140</y>
+        <x>140</x>
+        <y>150</y>
         <width>101</width>
         <height>61</height>
        </rect>
@@ -83,18 +83,203 @@
       </property>
      </widget>
     </widget>
-    <widget class="QWidget" name="page_3">
+    <widget class="QWidget" name="page_4">
      <widget class="QLabel" name="label_3">
       <property name="geometry">
        <rect>
-        <x>280</x>
-        <y>120</y>
-        <width>101</width>
-        <height>61</height>
+        <x>330</x>
+        <y>20</y>
+        <width>131</width>
+        <height>41</height>
        </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>20</pointsize>
+       </font>
       </property>
       <property name="text">
        <string>排行榜</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="scorelabel1">
+      <property name="geometry">
+       <rect>
+        <x>290</x>
+        <y>100</y>
+        <width>280</width>
+        <height>30</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>15</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>1.</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="scorelabel2">
+      <property name="geometry">
+       <rect>
+        <x>290</x>
+        <y>140</y>
+        <width>280</width>
+        <height>30</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>15</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>2.</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="scorelabel3">
+      <property name="geometry">
+       <rect>
+        <x>290</x>
+        <y>180</y>
+        <width>280</width>
+        <height>30</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>15</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>3.</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="scorelabel4">
+      <property name="geometry">
+       <rect>
+        <x>290</x>
+        <y>220</y>
+        <width>280</width>
+        <height>30</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>15</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>4.</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="scorelabel5">
+      <property name="geometry">
+       <rect>
+        <x>290</x>
+        <y>260</y>
+        <width>280</width>
+        <height>30</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>15</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>5.</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="scorelabel6">
+      <property name="geometry">
+       <rect>
+        <x>290</x>
+        <y>300</y>
+        <width>280</width>
+        <height>30</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>15</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>6.</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="scorelabel7">
+      <property name="geometry">
+       <rect>
+        <x>290</x>
+        <y>340</y>
+        <width>280</width>
+        <height>30</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>15</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>7.</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="scorelabel8">
+      <property name="geometry">
+       <rect>
+        <x>290</x>
+        <y>380</y>
+        <width>280</width>
+        <height>30</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>15</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>8.</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="scorelabel9">
+      <property name="geometry">
+       <rect>
+        <x>290</x>
+        <y>420</y>
+        <width>280</width>
+        <height>30</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>15</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>9.</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="scorelabel10">
+      <property name="geometry">
+       <rect>
+        <x>290</x>
+        <y>460</y>
+        <width>280</width>
+        <height>30</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>15</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>10.</string>
       </property>
      </widget>
     </widget>
@@ -111,12 +296,18 @@
    </property>
    <widget class="QMenu" name="menu">
     <property name="title">
-     <string>帮助</string>
+     <string>系统</string>
     </property>
+    <addaction name="toHomeAction"/>
    </widget>
    <addaction name="menu"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
+  <action name="toHomeAction">
+   <property name="text">
+    <string>主界面</string>
+   </property>
+  </action>
  </widget>
  <resources/>
  <connections/>

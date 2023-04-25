@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <QDebug>
+#include <QFile>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -13,6 +14,24 @@ MainWindow::MainWindow(QWidget *parent)
 
     // 生成随机种子
     qsrand(QTime(0,0,0).secsTo(QTime::currentTime()));
+
+    // 初始化排名Label
+    scoreRackList = new QList<QLabel*>();
+    scoreRackList->append(ui->scorelabel1);
+    scoreRackList->append(ui->scorelabel2);
+    scoreRackList->append(ui->scorelabel3);
+    scoreRackList->append(ui->scorelabel4);
+    scoreRackList->append(ui->scorelabel5);
+    scoreRackList->append(ui->scorelabel6);
+    scoreRackList->append(ui->scorelabel7);
+    scoreRackList->append(ui->scorelabel8);
+    scoreRackList->append(ui->scorelabel9);
+    scoreRackList->append(ui->scorelabel10);
+
+    // 初始化成绩排名
+    scoreList = new QList<QPair<QString, QString>>();
+    // 读取文件
+    this->readFile();
 }
 
 MainWindow::~MainWindow()
@@ -23,11 +42,39 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_showRankBtn_clicked()
 {
-    ui->stackedWidget->setCurrentIndex(3);
+    this->toRankPage();
 }
 
-void MainWindow::distributionCards() {
+void MainWindow::distributionCards(int level) {
+    if (level == 1) {
+        this->cardNum = 9;
 
+        for(int i = 0; i < this->cardNum; i++) {
+    //        int imgIdx = qrand() % 20;
+            Card* card = new Card(this->names[0]);
+            initCardContainer->append(card);
+            // 绑定点击事件
+            connect(card, &Card::clicked, this, &MainWindow::cardBeClicked);
+
+            card->setParent(ui->stackedWidget->currentWidget());
+            card->move(qrand() % 700, qrand() % (ui->stackedWidget->height() - 200));
+            card->show();   // 显示出来
+        }
+    } else if (level == 2) {
+        this->cardNum = 9;
+
+        for(int i = 0; i < this->cardNum; i++) {
+    //        int imgIdx = qrand() % 20;
+            Card* card = new Card(this->names[0]);
+            initCardContainer->append(card);
+            // 绑定点击事件
+            connect(card, &Card::clicked, this, &MainWindow::cardBeClicked);
+
+            card->setParent(ui->stackedWidget->currentWidget());
+            card->move(qrand() % 700, qrand() % (ui->stackedWidget->height() - 200));
+            card->show();   // 显示出来
+        }
+    }
 }
 
 // 判断card是否是最上层的card
@@ -57,16 +104,162 @@ void MainWindow::cardBeClicked()
 {
     // 被点击的card
     Card *card = (Card*)sender();
+
     if (!this->isTop(card)) {
         qDebug() << "无法点击";
         return;
     }
-    // 如果是最上层的card
-    qDebug() << "yes";
-    dissolveCardContainer->append(card);
-    card->move(dissolveCardContainer->size() * CARD_SIZE, 450);
 
-    this->dissolveCards();
+    // 如果是最上层的card
+    qDebug() << "可以点击";
+
+    // 判断是否在卡槽内
+    if(card->isInSlot) {
+        this->toggleHighLight(card);
+        return;
+    }
+
+    // 如果点击的还是class, 并且存在高亮的，并且高亮的不是class
+    if (card->name == "class" && this->isSelectedList->size() > 0 && this->isSelectedList->at(0)->name != "class") {
+        delete card;
+        this->dissolveCardContainer->removeOne(this->isSelectedList->at(0));
+        delete this->isSelectedList->at(0);
+        this->isSelectedList->clear();
+
+        this->score += 2;
+        scoreLabel->setText(QString("分数：%1  ").arg(this->score));
+    } else {
+        card->isInSlot = true;
+        dissolveCardContainer->append(card);
+        card->move(dissolveCardContainer->size() * CARD_SIZE, 450);
+
+        this->dissolveCards();
+    }
+
+    // 卡片向左对齐
+    for(int i = 0; i < dissolveCardContainer->size(); i++) {
+        dissolveCardContainer->at(i)->move((i+1) * CARD_SIZE, 450);
+    }
+
+    // 判断是否赢了
+    if (this->cardNum == 0) {
+        qDebug() << "win";
+        if(this->level == 1) {
+            // 如果是第一关，那么就跳转到第二关
+            this->levelTow();
+        } else if(this->level == 2) {
+            // 如果是第二关，那么就结束游戏，保存成绩
+            this->saveScore();
+            // 跳转到排行榜
+            this->toRankPage();
+        }
+    }
+}
+
+void MainWindow::toggleHighLight(Card* card)
+{
+    if(this->isSelectedList->size() == 0) {
+        // 没有被选中的，则加入
+        this->isSelectedList->append(card);
+        // 高亮
+        card->setStyleSheet("background-color: yellow;");
+    } else {
+        // 如果已经有高亮的
+        if(this->isSelectedList->at(0) == card) {
+            qDebug() << "是自己";
+            // 如果就是自己, 则取消高亮
+            card->setStyleSheet("background-color: none;");
+            this->isSelectedList->clear();
+        } else {
+            // 如果是其他的
+            qDebug() << "是其他的";
+            // 先将之前的清除掉
+            this->isSelectedList->at(0)->setStyleSheet("background-color: none;");
+            this->isSelectedList->clear();
+            // 添加新的
+            card->setStyleSheet("background-color: yellow;");
+            this->isSelectedList->append(card);
+        }
+    }
+}
+
+// 第二关
+void MainWindow::levelTow()
+{
+    this->level = 2;
+    // 切换页面
+    ui->stackedWidget->setCurrentIndex(2);
+    // 更改第几关
+    levelLabel->setText("第二关 ");
+
+    this->distributionCards(2);
+}
+
+void MainWindow::saveScore()
+{
+    qDebug() << "saveScore" << endl;
+    // 将当前的玩家姓名和成绩添加到容器中
+    this->scoreList->append(QPair<QString, QString>(this->username, QString("%1").arg(this->score)));
+    qDebug() << this->scoreList;
+    // 排序
+    std::sort(this->scoreList->begin(), this->scoreList->end(), [](QPair<QString, QString> a, QPair<QString, QString> b) {
+        return a.second.toInt() > b.second.toInt();
+    });
+    // 如果超出了10个，则讲后面的全部去掉
+    while(this->scoreList->size() > 10) {
+        this->scoreList->removeLast();
+    }
+
+    // 打开文件，如果不存在则会自动创建新的同名的文件
+    QFile file(this->fileName);
+    file.open(QIODevice::WriteOnly);
+
+    QDataStream out(&file);
+
+    for (int i = 0; i < this->scoreList->size(); i++) {
+        out << this->scoreList->at(i).first << this->scoreList->at(i).second;
+    }
+
+    file.close();
+}
+
+void MainWindow::showScore()
+{
+    qDebug() << "showScore";
+    qDebug() << this->scoreList->size();
+    for (int i = 0; i < this->scoreList->size(); i++) {
+        qDebug() << this->scoreList->at(i).first << this->scoreList->at(i).second;
+        this->scoreRackList->at(i)->setText(QString("%1. %2 %3").arg(i + 1).arg(this->scoreList->at(i).first).arg(this->scoreList->at(i).second));
+    }
+}
+
+void MainWindow::readFile()
+{
+    qDebug() << "readFile";
+    QFile file(this->fileName);
+    file.open(QIODevice::ReadOnly);
+
+    QList<QString> list;
+
+    QDataStream in(&file);
+    while (!in.atEnd()) {
+        QByteArray line;
+        in >> line;
+        list.append(line.data());
+    }
+    file.close();
+
+    for (int i = 0; i < list.size(); i += 2) {
+        this->scoreList->append(QPair<QString, QString>(list.at(i), list.at(i+1)));
+    }
+}
+
+void MainWindow::toRankPage()
+{
+    ui->stackedWidget->setCurrentIndex(3);
+
+    // 展示分数
+    this->showScore();
 }
 
 void MainWindow::deleteCard(QList<int> idxs)
@@ -80,6 +273,18 @@ void MainWindow::deleteCard(QList<int> idxs)
     this->cardNum -= idxs.size();
 }
 
+void MainWindow::clearAll()
+{
+    for(int i = dissolveCardContainer->size() - 1; i >= 0; i--) {
+        Card* card = dissolveCardContainer->at(i);
+        dissolveCardContainer->removeAt(i);
+        delete card;
+    }
+    this->cardNum -= dissolveCardContainer->size();
+}
+
+
+
 // 消除卡片
 void MainWindow::dissolveCards()
 {
@@ -92,16 +297,6 @@ void MainWindow::dissolveCards()
     qDebug() << "可以消除" << scoreDelta;
     this->score += scoreDelta;
     scoreLabel->setText(QString("分数：%1  ").arg(this->score));
-
-    // 卡片向左对齐
-    for(int i = 0; i < dissolveCardContainer->size(); i++) {
-        dissolveCardContainer->at(i)->move((i+1) * CARD_SIZE, 450);
-    }
-
-    // 判断是否赢了
-    if (this->cardNum == 0) {
-        qDebug() << "win";
-    }
 }
 
 int MainWindow::canDissolve()
@@ -169,6 +364,12 @@ int MainWindow::canDissolve()
         return score;
     }
 
+    // 两张class消除所有
+    if (map["class"].size() >= 2) {
+        this->clearAll();
+        return 15;
+    }
+
     return 0;   // 不能消除
 }
 
@@ -193,20 +394,22 @@ int MainWindow::canDissolveTwo(QMap<QString, QList<int>> map, QList<QString> nam
 void MainWindow::on_startGameBtn_clicked()
 {
     // 校验输入框
-    if (ui->usernamelineEdit->text().isEmpty()) {
+    this->username = ui->usernamelineEdit->text();
+    if (this->username.isEmpty()) {
         ui->usernamelineEdit->setStyleSheet("border: 1px solid red;");
         qDebug() << "用户名为空";
         return;
     }
 
-
-    this->level = 0;    // 第一关
+    this->level = 1;    // 第一关
     this->dissolveCardContainer = new QList<Card*>();
+    this->initCardContainer = new QList<Card*>();
     this->score = 0;
+    this->isSelectedList = new QList<Card*>();
 
     // 展示分数和用户名
     levelLabel = new QLabel("第一关  ");
-    usernameLabel = new QLabel(QString("用户名：%1  ").arg(ui->usernamelineEdit->text()));
+    usernameLabel = new QLabel(QString("用户名：%1  ").arg(this->username));
     scoreLabel = new QLabel(QString("分数：%1  ").arg(this->score));
 
     ui->statusbar->addWidget(levelLabel);
@@ -216,18 +419,17 @@ void MainWindow::on_startGameBtn_clicked()
     // 切换页面
     ui->stackedWidget->setCurrentIndex(1);
 
-    this->cardNum = 10;
-
-    for(int i = 0; i < this->cardNum; i++) {
-        int imgIdx = qrand() % 20;
-        Card* card = new Card(this->names[imgIdx]);
-        // 绑定点击事件
-        connect(card, &Card::clicked, this, &MainWindow::cardBeClicked);
-
-        card->setParent(ui->stackedWidget->currentWidget());
-        card->move(qrand() % 700, qrand() % (ui->stackedWidget->height() - 200));
-        card->show();   // 显示出来
-    }
+    // 分布卡片
+    this->distributionCards(1);
 }
 
 
+// 回到主页面
+void MainWindow::on_toHomeAction_triggered()
+{
+    // 改变界面
+    ui->stackedWidget->setCurrentIndex(0);
+
+    ui->usernamelineEdit->clear();
+
+}

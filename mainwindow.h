@@ -20,6 +20,8 @@ public:
     ~MainWindow();
 
     void distributionCards(int level);   // 分布卡片
+    void createCards(int num);                     // 生成卡片
+
     bool isTop(Card *card);            // 卡片是否可以被点击
     void dissolveCards();       // 消除卡片
     int canDissolve();         // 可以消除

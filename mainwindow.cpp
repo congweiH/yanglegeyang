@@ -20,7 +20,7 @@ MainWindow::MainWindow(QWidget *parent)
     QMediaPlayer *mediaPlayer = new QMediaPlayer(this);
     mediaPlayer->setAudioOutput(audioOutput);
     mediaPlayer->setSource(QUrl::fromLocalFile("bgm.mp3"));
-    mediaPlayer->setLoops(-1);
+    mediaPlayer->setLoops(-1);  // 循环播放
     mediaPlayer->play();
 
     // 生成随机种子
@@ -43,6 +43,15 @@ MainWindow::MainWindow(QWidget *parent)
     scoreList = new QList<QPair<QString, QString>>();
     // 读取文件
     this->readFile();
+
+    // 初始化底部状态栏
+    levelLabel = new QLabel();
+    usernameLabel = new QLabel();
+    scoreLabel = new QLabel();
+
+    ui->statusbar->addWidget(levelLabel);
+    ui->statusbar->addWidget(usernameLabel);
+    ui->statusbar->addWidget(scoreLabel);
 }
 
 MainWindow::~MainWindow()
@@ -57,26 +66,20 @@ void MainWindow::on_showRankBtn_clicked()
 }
 
 void MainWindow::distributionCards(int level) {
+    initCardContainer->clear();
     if (level == 1) {
-        this->cardNum = 9;
-
-        for(int i = 0; i < this->cardNum; i++) {
-    //        int imgIdx = qrand() % 20;
-            Card* card = new Card(this->names[0]);
-            initCardContainer->append(card);
-            // 绑定点击事件
-            connect(card, &Card::clicked, this, &MainWindow::cardBeClicked);
-
-            card->setParent(ui->stackedWidget->currentWidget());
-            card->move(rand() % 700, rand() % (ui->stackedWidget->height() - 200));
-            card->show();   // 显示出来
-        }
+        this->createCards(5);
     } else if (level == 2) {
-        this->cardNum = 9;
+        this->createCards(20);
+    }
+}
 
-        for(int i = 0; i < this->cardNum; i++) {
-    //        int imgIdx = qrand() % 20;
-            Card* card = new Card(this->names[0]);
+void MainWindow::createCards(int num)
+{
+    for(int i = 0; i < num; i++) {
+        int cardIdx = rand() % 20;
+        for (int i = 0; i < 3; i++) {
+            Card* card = new Card(this->names[cardIdx]);
             initCardContainer->append(card);
             // 绑定点击事件
             connect(card, &Card::clicked, this, &MainWindow::cardBeClicked);
@@ -86,6 +89,7 @@ void MainWindow::distributionCards(int level) {
             card->show();   // 显示出来
         }
     }
+    this->cardNum = initCardContainer->size();
 }
 
 // 判断card是否是最上层的card
@@ -269,6 +273,8 @@ void MainWindow::toRankPage()
 {
     ui->stackedWidget->setCurrentIndex(3);
 
+    levelLabel->setText("排行榜");
+
     // 展示分数
     this->showScore();
 }
@@ -418,14 +424,10 @@ void MainWindow::on_startGameBtn_clicked()
     this->score = 0;
     this->isSelectedList = new QList<Card*>();
 
-    // 展示分数和用户名
-    levelLabel = new QLabel("第一关  ");
-    usernameLabel = new QLabel(QString("用户名：%1  ").arg(this->username));
-    scoreLabel = new QLabel(QString("分数：%1  ").arg(this->score));
-
-    ui->statusbar->addWidget(levelLabel);
-    ui->statusbar->addWidget(usernameLabel);
-    ui->statusbar->addWidget(scoreLabel);
+    // 设置底部状态栏文本
+    levelLabel->setText("第一关  ");
+    usernameLabel->setText(QString("用户名：%1  ").arg(this->username));
+    scoreLabel->setText(QString("分数：%1  ").arg(this->score));
 
     // 切换页面
     ui->stackedWidget->setCurrentIndex(1);

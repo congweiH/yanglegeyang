@@ -2,6 +2,9 @@
 #include "ui_mainwindow.h"
 #include <QDebug>
 #include <QFile>
+#include <QtMultimedia/QMediaPlayer>
+#include <QtMultimedia/QAudioOutput>
+#include <QUrl>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -12,8 +15,16 @@ MainWindow::MainWindow(QWidget *parent)
     this->setFixedSize(800, 600);
     this->setWindowTitle("羊了个羊");
 
+    // 播放音乐
+    QAudioOutput *audioOutput = new QAudioOutput(this);
+    QMediaPlayer *mediaPlayer = new QMediaPlayer(this);
+    mediaPlayer->setAudioOutput(audioOutput);
+    mediaPlayer->setSource(QUrl::fromLocalFile("bgm.mp3"));
+    mediaPlayer->setLoops(-1);
+    mediaPlayer->play();
+
     // 生成随机种子
-    qsrand(QTime(0,0,0).secsTo(QTime::currentTime()));
+    srand(QTime(0,0,0).secsTo(QTime::currentTime()));
 
     // 初始化排名Label
     scoreRackList = new QList<QLabel*>();
@@ -57,7 +68,7 @@ void MainWindow::distributionCards(int level) {
             connect(card, &Card::clicked, this, &MainWindow::cardBeClicked);
 
             card->setParent(ui->stackedWidget->currentWidget());
-            card->move(qrand() % 700, qrand() % (ui->stackedWidget->height() - 200));
+            card->move(rand() % 700, rand() % (ui->stackedWidget->height() - 200));
             card->show();   // 显示出来
         }
     } else if (level == 2) {
@@ -71,7 +82,7 @@ void MainWindow::distributionCards(int level) {
             connect(card, &Card::clicked, this, &MainWindow::cardBeClicked);
 
             card->setParent(ui->stackedWidget->currentWidget());
-            card->move(qrand() % 700, qrand() % (ui->stackedWidget->height() - 200));
+            card->move(rand() % 700, rand() % (ui->stackedWidget->height() - 200));
             card->show();   // 显示出来
         }
     }
@@ -197,7 +208,7 @@ void MainWindow::levelTow()
 
 void MainWindow::saveScore()
 {
-    qDebug() << "saveScore" << endl;
+    qDebug() << "saveScore";
     // 将当前的玩家姓名和成绩添加到容器中
     this->scoreList->append(QPair<QString, QString>(this->username, QString("%1").arg(this->score)));
     qDebug() << this->scoreList;

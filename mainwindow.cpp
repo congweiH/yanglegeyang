@@ -178,16 +178,38 @@ void MainWindow::cardBeClicked()
         } else if(this->level == 2) {
             // 如果是第二关，那么就结束游戏，保存成绩
             this->saveScore();
-            // 跳转到排行榜
-            this->toRankPage();
+
+            QString msg = QString("游戏胜利，您的分数是: %1").arg(this->score);
+            this->gameOver(msg);
         }
     } else if(this->cardNum == this->dissolveCardContainer->size() || this->dissolveCardContainer->size() > 7) {
         qDebug() << "没有卡片可以选择了";
         this->saveScore();
         // 如果没有卡牌可以选了，但是卡槽还存在卡片, 获取卡槽的
-        if(QMessageBox::Ok == QMessageBox::information(this, "提示", "游戏失败")) {
-            this->toHomePage();
-        }
+        QString msg = QString("游戏失败，您的分数是: %1").arg(this->score);
+
+        this->gameOver(msg);
+    }
+}
+
+void MainWindow::gameOver(QString msg) {
+    QMessageBox *messageBox = new QMessageBox(this);
+    QPushButton *homeBtn = new QPushButton("回到主页");
+    QPushButton *rankBtn = new QPushButton("排行榜");
+    messageBox->setIcon(QMessageBox::Information);
+    messageBox->setWindowTitle("提示");
+    messageBox->addButton(homeBtn, QMessageBox::AcceptRole);
+    messageBox->addButton(rankBtn, QMessageBox::RejectRole);
+    messageBox->setText(msg);
+
+    messageBox->show();
+
+    messageBox->exec();
+
+    if(messageBox->clickedButton() == rankBtn) {
+        this->toRankPage();
+    } else {
+        this->toHomePage();
     }
 }
 

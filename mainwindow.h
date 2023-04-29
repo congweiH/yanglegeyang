@@ -40,6 +40,8 @@ public:
     void toRankPage();
     void toHomePage();
 
+    void gameOver(QString msg);    // 游戏结束，不管输赢
+
     void paintEvent(QPaintEvent* event);
 
 private slots:

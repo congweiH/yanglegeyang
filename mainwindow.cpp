@@ -5,12 +5,16 @@
 #include <QtMultimedia/QMediaPlayer>
 #include <QtMultimedia/QAudioOutput>
 #include <QUrl>
+#include <QPainter>
+#include <QPixmap>
+#include <QMessageBox>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    this->setWindowIcon(QIcon(":/img/icon.png"));
 
     this->setFixedSize(800, 600);
     this->setWindowTitle("羊了个羊");
@@ -52,6 +56,10 @@ MainWindow::MainWindow(QWidget *parent)
     ui->statusbar->addWidget(levelLabel);
     ui->statusbar->addWidget(usernameLabel);
     ui->statusbar->addWidget(scoreLabel);
+
+    this->dissolveCardContainer = new QList<Card*>();
+    this->initCardContainer = new QList<Card*>();
+    this->isSelectedList = new QList<Card*>();
 }
 
 MainWindow::~MainWindow()
@@ -127,6 +135,7 @@ void MainWindow::cardBeClicked()
 
     // 如果是最上层的card
     qDebug() << "可以点击";
+    this->initCardContainer->removeOne(card);
 
     // 判断是否在卡槽内
     if(card->isInSlot) {
@@ -140,6 +149,8 @@ void MainWindow::cardBeClicked()
         this->dissolveCardContainer->removeOne(this->isSelectedList->at(0));
         delete this->isSelectedList->at(0);
         this->isSelectedList->clear();
+
+        this->cardNum -= 2;
 
         this->score += 2;
         scoreLabel->setText(QString("分数：%1  ").arg(this->score));
@@ -156,6 +167,8 @@ void MainWindow::cardBeClicked()
         dissolveCardContainer->at(i)->move((i+1) * CARD_SIZE, 450);
     }
 
+    qDebug() << this->cardNum << this->dissolveCardContainer->size();
+
     // 判断是否赢了
     if (this->cardNum == 0) {
         qDebug() << "win";
@@ -167,6 +180,13 @@ void MainWindow::cardBeClicked()
             this->saveScore();
             // 跳转到排行榜
             this->toRankPage();
+        }
+    } else if(this->cardNum == this->dissolveCardContainer->size() || this->dissolveCardContainer->size() > 7) {
+        qDebug() << "没有卡片可以选择了";
+        this->saveScore();
+        // 如果没有卡牌可以选了，但是卡槽还存在卡片, 获取卡槽的
+        if(QMessageBox::Ok == QMessageBox::information(this, "提示", "游戏失败")) {
+            this->toHomePage();
         }
     }
 }
@@ -292,15 +312,13 @@ void MainWindow::deleteCard(QList<int> idxs)
 
 void MainWindow::clearAll()
 {
+    this->cardNum -= dissolveCardContainer->size();
     for(int i = dissolveCardContainer->size() - 1; i >= 0; i--) {
         Card* card = dissolveCardContainer->at(i);
         dissolveCardContainer->removeAt(i);
         delete card;
     }
-    this->cardNum -= dissolveCardContainer->size();
 }
-
-
 
 // 消除卡片
 void MainWindow::dissolveCards()
@@ -419,10 +437,7 @@ void MainWindow::on_startGameBtn_clicked()
     }
 
     this->level = 1;    // 第一关
-    this->dissolveCardContainer = new QList<Card*>();
-    this->initCardContainer = new QList<Card*>();
     this->score = 0;
-    this->isSelectedList = new QList<Card*>();
 
     // 设置底部状态栏文本
     levelLabel->setText("第一关  ");
@@ -436,13 +451,42 @@ void MainWindow::on_startGameBtn_clicked()
     this->distributionCards(1);
 }
 
-
 // 回到主页面
 void MainWindow::on_toHomeAction_triggered()
 {
+    this->toHomePage();
+}
+
+void MainWindow::toHomePage()
+{
+    qDebug() << "回到首页";
     // 改变界面
     ui->stackedWidget->setCurrentIndex(0);
 
     ui->usernamelineEdit->clear();
 
+    for(int i = 0; i < this->initCardContainer->size(); i++) {
+        delete this->initCardContainer->at(i);
+    }
+
+    for(int i = 0; i < this->dissolveCardContainer->size(); i++) {
+        delete this->dissolveCardContainer->at(i);
+    }
+
+    this->initCardContainer->clear();
+    this->dissolveCardContainer->clear();
+    this->isSelectedList->clear();
+
+    levelLabel->setText("");
+    usernameLabel->setText("");
+    scoreLabel->setText("");
+
+    this->score = 0;
+}
+
+void MainWindow::paintEvent(QPaintEvent* event)
+{
+    QPainter *painter = new QPainter(this);
+    QPixmap pic = QPixmap(":/bg.jpg");
+    painter->drawPixmap(0, 0, this->width(), this->height(), pic);
 }

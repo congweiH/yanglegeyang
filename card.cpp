@@ -15,7 +15,6 @@ Card::Card(QString name)
     this->clickNum = 0;
 
     this->setFixedSize(pix.width() + 8, pix.height() + 8);
-    qDebug() << pix.width() << " " << pix.height();
     this->setIcon(pix);
     this->setIconSize(QSize(pix.width(), pix.height()));
 }

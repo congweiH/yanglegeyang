@@ -38,7 +38,9 @@ public:
     void readFile();
 
     void toRankPage();
+    void toHomePage();
 
+    void paintEvent(QPaintEvent* event);
 
 private slots:
     void on_showRankBtn_clicked();
@@ -65,6 +67,8 @@ public:
     QList<QLabel*> *scoreRackList;
 
     QList<QPair<QString, QString>> *scoreList;
+
+
 
     const int CARD_SIZE = 64 + 8;    // 图片大小 64px
     QString names[20] = {

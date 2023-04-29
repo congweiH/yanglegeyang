@@ -20,5 +20,7 @@
         <file>img/switch.png</file>
         <file>img/union.png</file>
         <file>img/while.png</file>
+        <file>bg.jpg</file>
+        <file>img/icon.png</file>
     </qresource>
 </RCC>
